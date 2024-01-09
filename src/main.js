@@ -5,6 +5,8 @@ import "../src/assets/css/animate.css";
 import ToastPlugin from "vue-toast-notification";
 import "vuetify/styles";
 
+import "vue-toast-notification/dist/theme-sugar.css";
+
 // Vuetify
 import "vuetify/styles";
 import { createVuetify } from "vuetify";
