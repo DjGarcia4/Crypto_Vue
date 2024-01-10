@@ -54,7 +54,7 @@ const $toast = useToast();
 const emit = defineEmits([
   "update:currency",
   "update:cryptocurrency",
-  "quotingCrypto",
+  "quoteCrypto",
 ]);
 const props = defineProps({
   currencies: {
@@ -73,7 +73,7 @@ const props = defineProps({
 
 const handleSubmit = () => {
   if (props.currency && props.cryptocurrency) {
-    emit("quotingCrypto");
+    emit("quoteCrypto");
   } else {
     $toast.error(
       `Please select a ${

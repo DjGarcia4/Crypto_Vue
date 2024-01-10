@@ -35,61 +35,64 @@
       </v-card>
     </Transition>
 
-    <div class="d-md-flex">
-      <CriptoForm
-        :currencies="currencies"
-        :cryptocurrencies="cryptocurrencies"
-        v-model:currency="quoting.currency"
-        v-model:cryptocurrency="quoting.cryptocurrency"
-        @quotingCrypto="quotingCrypto"
-      />
-      <Transition
-        name="custom-classes"
-        enter-active-class="animate__animated animate__backInRight"
-        leave-active-class="animate__animated animate__backOutDown"
-      >
-        <Quoting v-if="showQuoting" />
-      </Transition>
-    </div>
+    <v-row>
+      <v-col cols="12" md="6">
+        <CriptoForm
+          :currencies="currencies"
+          :cryptocurrencies="cryptocurrencies"
+          v-model:currency="quote.currency"
+          v-model:cryptocurrency="quote.cryptocurrency"
+          @quoteCrypto="quoteCrypto"
+        />
+      </v-col>
+      <v-col cols="12" md="6">
+        <Transition
+          name="custom-classes"
+          enter-active-class="animate__animated animate__backInRight"
+          leave-active-class="animate__animated animate__backOutRight"
+        >
+          <Quote :quotation="quotation" v-if="showQuote" />
+        </Transition>
+        <Transition
+          name="custom-classes"
+          enter-active-class="animate__animated animate__backInLeft"
+          leave-active-class="animate__animated animate__backOutLeft"
+        >
+          <div
+            v-if="Object.keys(quotation).length === 0"
+            class="w-100 d-flex justify-center align-center h-100"
+          >
+            <p class="text-center text-h5 font-weight-bold text-grey-darken-2">
+              Nothing has been quoted yet.
+            </p>
+          </div>
+        </Transition>
+      </v-col>
+    </v-row>
   </v-container>
 </template>
 
 <script setup>
-import { ref, onMounted, reactive } from "vue";
-import { useToast } from "vue-toast-notification";
+import { ref, reactive } from "vue";
 import CriptoForm from "./components/criptoForm.vue";
-import Quoting from "./components/quoting.vue";
-const currencies = ref([
-  { code: "USD", text: "United States Dollar" },
-  { code: "MXN", text: "Mexican Peso" },
-  { code: "EUR", text: "Euro" },
-  { code: "GBP", text: "British Pound Sterling" },
-  { code: "HNL", text: "Honduran Lempira" },
-]);
-const $toast = useToast();
-const cryptocurrencies = ref([]);
-const quoting = reactive({
+import Quote from "./components/quote.vue";
+import useCripto from "./composables/useCripto";
+
+const { currencies, cryptocurrencies, showQuote, quotation, getQuote } =
+  useCripto();
+
+const quote = reactive({
   currency: "",
   cryptocurrency: "",
 });
-const showQuoting = ref(false);
 
-const quotingCrypto = () => {
-  showQuoting.value = !showQuoting.value;
-  $toast.success("Si se pudo! ", {
-    position: "top",
-  });
+const quoteCrypto = () => {
+  getQuote(quote);
 };
-
-onMounted(() => {
-  const url =
-    "https://min-api.cryptocompare.com/data/top/mktcapfull?limit=20&tsym=USD";
-  fetch(url)
-    .then((response) => response.json())
-    .then(({ Data }) => {
-      cryptocurrencies.value = Data;
-    });
-});
 </script>
 
-<style scoped></style>
+<style scoped>
+.animate__animated {
+  --animate-duration: 0.8s;
+}
+</style>
